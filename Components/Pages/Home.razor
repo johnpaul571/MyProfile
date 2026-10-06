@@ -1,17 +1,91 @@
 ﻿@page "/"
+@rendermode InteractiveServer
 
-<div class="profile-card">
+@using System.Net.Http.Json
+@using MyProfile.Models
+@inject NavigationManager Navigation
 
-    <h1 class="profile-title">My Profile</h1>
+<div class="dashboard">
 
-    <img class="profile-image" src="images/profile.jpg" alt="Profile Picture" />
+    <h1>My Profile Dashboard</h1>
 
-    <h2 class="profile-name">John Paul C. Ayupan</h2>
+    <div class="search-box">
+        <input @bind="searchText" placeholder="Search Name, Course, or School" />
+        <button @onclick="SearchProfile">Search</button>
+    </div>
 
-    <p class="profile-course">BSIT Student</p>
+    @if (!string.IsNullOrEmpty(result))
+    {
+        <div class="result-card">
+            <h2>Search Result</h2>
+            <p>@result</p>
+        </div>
+    }
 
-    <p class="profile-description">
-        Welcome to my personal profile.
-    </p>
+    <div class="profile-card">
+
+        <h2 class="profile-title">My Profile</h2>
+
+        <img class="profile-image"
+             src="images/profile.jpg"
+             alt="Profile Picture" />
+
+        <h2 class="profile-name">John Paul C. Ayupan</h2>
+
+        <p class="profile-course">BSIT Student</p>
+
+        <p class="profile-description">
+            Welcome to my personal profile.
+        </p>
+
+    </div>
 
 </div>
+
+@code {
+
+    private string searchText = "";
+    private string result = "";
+
+    private global::MyProfile.Models.MyProfile profile;
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var http = new HttpClient
+        {
+            BaseAddress = new Uri(Navigation.BaseUri)
+        };
+
+        profile = await http.GetFromJsonAsync<global::MyProfile.Models.MyProfile>("/api/profile");
+    }
+
+    private void SearchProfile()
+    {
+        result = "";
+
+        if (profile == null)
+        {
+            result = "No profile information found.";
+            return;
+        }
+
+        string search = searchText.Trim().ToLower();
+
+        if (search == "name")
+        {
+            result = $"Name: {profile.Name}";
+        }
+        else if (search == "course")
+        {
+            result = $"Course: {profile.Course}";
+        }
+        else if (search == "school")
+        {
+            result = $"School: {profile.School}";
+        }
+        else
+        {
+            result = "Please search: Name, Course, or School.";
+        }
+    }
+}
