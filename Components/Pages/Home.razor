@@ -1,0 +1,181 @@
+﻿@page "/"
+@using MyProfileWeb.Models
+@inject HttpClient Http
+
+<PageTitle>Student Profile</PageTitle>
+
+<div class="profile-container">
+    @if (student == null)
+    {
+        <div class="loading-state">
+            <p><em>Loading student details...</em></p>
+        </div>
+    }
+    else
+    {
+        <div class="profile-card">
+            <!-- Header Banner -->
+            <div class="card-header">
+                <div class="avatar">
+                    <img src="images/profile.jpg" alt="Profile Picture" class="profile-img" />
+                </div>
+                <h2>@student.Name</h2>
+                <p class="subtitle">@student.Course — @student.YearLevel</p>
+            </div>
+
+            <!-- Content Details -->
+            <div class="card-body">
+                <div class="info-group">
+                    <span class="label">🏫 School</span>
+                    <span class="value">@student.School</span>
+                </div>
+
+                <div class="info-group">
+                    <span class="label">🎂 Birthday & Age</span>
+                    <span class="value">@student.Birthday (@student.Age yrs old)</span>
+                </div>
+
+                <div class="info-group">
+                    <span class="label">📍 Location</span>
+                    <span class="value">@student.Location</span>
+                </div>
+
+                <div class="info-group">
+                    <span class="label">📞 Contact Number</span>
+                    <span class="value">@student.ContactNumber</span>
+                </div>
+
+                <div class="info-group">
+                    <span class="label">🏀 Favorite Sport</span>
+                    <span class="value">@student.FavoriteSport</span>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+<style>
+    .profile-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 30px 15px;
+        min-height: 80vh;
+    }
+
+    .profile-card {
+        width: 100%;
+        max-width: 450px;
+        background: #0d0f12;
+        border-radius: 20px;
+        box-shadow: 0 12px 35px rgba(235, 15, 60, 0.25), 0 0 15px rgba(0, 210, 190, 0.15);
+        border: 1px solid rgba(235, 15, 60, 0.3);
+        overflow: hidden;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .card-header {
+        background: linear-gradient(135deg, #090a0f 0%, #1a050d 40%, #e60039 100%);
+        color: #ffffff;
+        padding: 35px 20px 25px 20px;
+        text-align: center;
+        position: relative;
+    }
+
+    .avatar {
+        width: 105px;
+        height: 105px;
+        margin: 0 auto 14px auto;
+        border-radius: 50%;
+        border: 3px solid #ff1a40;
+        box-shadow: 0 0 20px rgba(255, 26, 64, 0.6), 0 0 10px rgba(0, 230, 204, 0.4);
+        overflow: hidden;
+    }
+
+    .profile-img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .card-header h2 {
+        margin: 0;
+        font-size: 23px;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+        color: #ffffff;
+        text-shadow: 0 2px 8px rgba(0,0,0,0.8);
+    }
+
+    .subtitle {
+        margin: 6px 0 0 0;
+        font-size: 14px;
+        color: #00e6cc;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+    }
+
+    .card-body {
+        padding: 24px 28px;
+        background: #0d0f12;
+    }
+
+    .info-group {
+        display: flex;
+        flex-direction: column;
+        padding: 12px 0;
+        border-bottom: 1px solid rgba(255, 26, 64, 0.12);
+    }
+
+    .info-group:last-child {
+        border-bottom: none;
+    }
+
+    .label {
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        color: #ff2a55;
+        letter-spacing: 1px;
+        margin-bottom: 4px;
+    }
+
+    .value {
+        font-size: 15px;
+        color: #e2e8f0;
+        font-weight: 500;
+    }
+
+    .loading-state {
+        text-align: center;
+        padding: 40px;
+        color: #ff2a55;
+    }
+</style>
+
+@code {
+    private Student? student;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            student = await Http.GetFromJsonAsync<Student>("api/student");
+        }
+        catch
+        {
+            student = new Student
+            {
+                Name = "John Paul C. Ayupan",
+                Age = 23,
+                Course = "BSIT",
+                YearLevel = "3rd year college",
+                School = "Southern Christian College",
+                Location = "Poblacion III, Pigcawayan, North Cotabato",
+                ContactNumber = "09776727018",
+                Birthday = "June 15, 2003",
+                FavoriteSport = "Basketball"
+            };
+        }
+    }
+}
